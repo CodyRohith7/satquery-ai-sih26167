@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "test_name": "diagnose_grounding_quality",
+  "model_id": "microsoft/Florence-2-base",
+  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "started_at_utc": "2026-09-05T16:16:50.086590Z",
+  "status": "SUCCESS",
+  "model_load_success": true,
+  "generation_diagnostics": {
+    "model_class_name": "Florence2ForConditionalGeneration",
+    "model_class_mro": [
+      "Florence2ForConditionalGeneration",
+      "Florence2ForConditionalGeneration",
+      "Florence2PreTrainedModel",
+      "PreTrainedModel",
+      "Module",
+      "EmbeddingAccessMixin",
+      "ModuleUtilsMixin",
+      "PushToHubMixin",
+      "PeftAdapterMixin",
+      "GenerationMixin",
+      "ContinuousMixin",
+      "object"
+    ],
+    "generation_mixin_in_mro": true,
+    "isinstance_generation_mixin": true
+  },
+  "image_size_wh": [
+    678,
+    452
+  ],
+  "settled_generation_config": {
+    "working_generation_config": "use_cache=False",
+    "generation_kwargs_used": {
+      "max_new_tokens": 1024,
+      "num_beams": 3,
+      "do_sample": false,
+      "use_cache": false
+    },
+    "failed_attempts": [
+      {
+        "label": "requested configuration (as given)",
+        "kwargs": {
+          "max_new_tokens": 1024,
+          "num_beams": 3,
+          "do_sample": false
+        },
+        "error": "AttributeError: 'NoneType' object has no attribute 'shape'",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\codyr\\PycharmProjects\\satquery-ai\\scripts\\..\\src\\models\\florence2_compat.py\", line 289, in generate_florence2\n    generated_ids = model.generate(**kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2795, in generate\n    return self.language_model.generate(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2564, in generate\n    result = decoding_method(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 3263, in _beam_search\n    model_inputs = self.prepare_inputs_for_generation(flat_running_sequences, **model_kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2197, in prepare_inputs_for_generation\n    past_length = past_key_values[0][0].shape[2]\nAttributeError: 'NoneType' object has no attribute 'shape'\n"
+      },
+      {
+        "label": "greedy decoding (num_beams=1)",
+        "kwargs": {
+          "max_new_tokens": 1024,
+          "num_beams": 1,
+          "do_sample": false
+        },
+        "error": "AttributeError: 'NoneType' object has no attribute 'shape'",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\codyr\\PycharmProjects\\satquery-ai\\scripts\\..\\src\\models\\florence2_compat.py\", line 289, in generate_florence2\n    generated_ids = model.generate(**kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2795, in generate\n    return self.language_model.generate(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2564, in generate\n    result = decoding_method(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2781, in _sample\n    model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2197, in prepare_inputs_for_generation\n    past_length = past_key_values[0][0].shape[2]\nAttributeError: 'NoneType' object has no attribute 'shape'\n"
+      }
+    ]
+  },
+  "experiments": {
+    "OD_simplest_official_baseline": {
+      "task_prompt": "<OD>",
+      "phrase": null,
+      "inference_seconds": 8.172,
+      "raw_generated_text": "</s><s>poster<loc_0><loc_0><loc_998><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            0.33899998664855957,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "poster"
+        ]
+      },
+      "num_boxes": 1,
+      "area_fractions": [
+        0.996
+      ]
+    },
+    "DENSE_REGION_CAPTION_baseline": {
+      "task_prompt": "<DENSE_REGION_CAPTION>",
+      "phrase": null,
+      "inference_seconds": 4.265,
+      "raw_generated_text": "</s><s>No object detected.</s>",
+      "parsed": {
+        "bboxes": [],
+        "labels": []
+      }
+    },
+    "grounding_farmland_bareword": {
+      "task_prompt": "<CAPTION_TO_PHRASE_GROUNDING>",
+      "phrase": "farmland",
+      "inference_seconds": 3.222,
+      "raw_generated_text": "</s><s>farmland<loc_2><loc_0><loc_998><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "farmland"
+        ]
+      },
+      "num_boxes": 1,
+      "area_fractions": [
+        0.994
+      ]
+    },
+    "grounding_buildings_bareword": {
+      "task_prompt": "<CAPTION_TO_PHRASE_GROUNDING>",
+      "phrase": "buildings",
+      "inference_seconds": 3.216,
+      "raw_generated_text": "</s><s>buildings<loc_2><loc_0><loc_998><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "buildings"
+        ]
+      },
+      "num_boxes": 1,
+      "area_fractions": [
+        0.994
+      ]
+    },
+    "grounding_farmland_caption_style": {
+      "task_prompt": "<CAPTION_TO_PHRASE_GROUNDING>",
+      "phrase": "a large area of farmland",
+      "inference_seconds": 4.648,
+      "raw_generated_text": "</s><s>a large area<loc_2><loc_0><loc_998><loc_998>farmland<loc_2><loc_0><loc_997><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ],
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.3049926757812,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "a large area",
+          "farmland"
+        ]
+      },
+      "num_boxes": 2,
+      "area_fractions": [
+        0.994,
+        0.993
+      ]
+    },
+    "grounding_buildings_caption_style": {
+      "task_prompt": "<CAPTION_TO_PHRASE_GROUNDING>",
+      "phrase": "a cluster of buildings",
+      "inference_seconds": 5.174,
+      "raw_generated_text": "</s><s>a cluster<loc_3><loc_0><loc_998><loc_998>buildings<loc_3><loc_0><loc_997><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            2.372999906539917,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ],
+          [
+            2.372999906539917,
+            0.22599999606609344,
+            676.3049926757812,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "a cluster",
+          "buildings"
+        ]
+      },
+      "num_boxes": 2,
+      "area_fractions": [
+        0.993,
+        0.992
+      ]
+    }
+  },
+  "error": null,
+  "traceback": null,
+  "farmland_vs_buildings_raw_text_identical": false,
+  "overlay_image_path": "diagnose_grounding_quality_overlay.png",
+  "finished_at_utc": "2026-09-05T16:17:30.686602Z"
+}

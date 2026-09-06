@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "test_name": "second_success_test_grounding",
+  "model_id": "microsoft/Florence-2-base",
+  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "target_phrases": [
+    "farmland",
+    "buildings"
+  ],
+  "started_at_utc": "2026-09-05T16:04:08.810490Z",
+  "status": "SUCCESS",
+  "model_load_success": true,
+  "model_load_seconds": 7.363,
+  "compat_report": {
+    "flash_attn_import_patch_applied": true,
+    "sdpa_attribute_patch_applied": false,
+    "attn_implementation_used": "eager",
+    "transformers_version": "4.57.1"
+  },
+  "generation_diagnostics": {
+    "model_class_name": "Florence2ForConditionalGeneration",
+    "model_class_mro": [
+      "Florence2ForConditionalGeneration",
+      "Florence2ForConditionalGeneration",
+      "Florence2PreTrainedModel",
+      "PreTrainedModel",
+      "Module",
+      "EmbeddingAccessMixin",
+      "ModuleUtilsMixin",
+      "PushToHubMixin",
+      "PeftAdapterMixin",
+      "GenerationMixin",
+      "ContinuousMixin",
+      "object"
+    ],
+    "generation_mixin_in_mro": true,
+    "isinstance_generation_mixin": true
+  },
+  "generation_report": {
+    "working_generation_config": "use_cache=False",
+    "generation_kwargs_used": {
+      "max_new_tokens": 1024,
+      "num_beams": 3,
+      "do_sample": false,
+      "use_cache": false
+    },
+    "failed_attempts": [
+      {
+        "label": "requested configuration (as given)",
+        "kwargs": {
+          "max_new_tokens": 1024,
+          "num_beams": 3,
+          "do_sample": false
+        },
+        "error": "AttributeError: 'NoneType' object has no attribute 'shape'",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\codyr\\PycharmProjects\\satquery-ai\\scripts\\..\\src\\models\\florence2_compat.py\", line 289, in generate_florence2\n    generated_ids = model.generate(**kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2795, in generate\n    return self.language_model.generate(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2564, in generate\n    result = decoding_method(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 3263, in _beam_search\n    model_inputs = self.prepare_inputs_for_generation(flat_running_sequences, **model_kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2197, in prepare_inputs_for_generation\n    past_length = past_key_values[0][0].shape[2]\nAttributeError: 'NoneType' object has no attribute 'shape'\n"
+      },
+      {
+        "label": "greedy decoding (num_beams=1)",
+        "kwargs": {
+          "max_new_tokens": 1024,
+          "num_beams": 1,
+          "do_sample": false
+        },
+        "error": "AttributeError: 'NoneType' object has no attribute 'shape'",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\codyr\\PycharmProjects\\satquery-ai\\scripts\\..\\src\\models\\florence2_compat.py\", line 289, in generate_florence2\n    generated_ids = model.generate(**kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2795, in generate\n    return self.language_model.generate(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2564, in generate\n    result = decoding_method(\n  File \"C:\\Users\\codyr\\miniforge3\\envs\\satquery\\lib\\site-packages\\transformers\\generation\\utils.py\", line 2781, in _sample\n    model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)\n  File \"C:\\Users\\codyr\\.cache\\huggingface\\modules\\transformers_modules\\microsoft\\Florence_hyphen_2_hyphen_base\\5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac\\modeling_florence2.py\", line 2197, in prepare_inputs_for_generation\n    past_length = past_key_values[0][0].shape[2]\nAttributeError: 'NoneType' object has no attribute 'shape'\n"
+      }
+    ]
+  },
+  "backend": "cpu",
+  "torch_version": "2.14.0+cpu",
+  "transformers_version": "4.57.1",
+  "ram_baseline_mb": 17.7,
+  "ram_after_load_mb": 1220.1,
+  "ram_after_inference_mb": 1284.9,
+  "peak_working_set_mb": 1662.2,
+  "per_phrase": {
+    "farmland": {
+      "inference_seconds": 8.212,
+      "raw_generated_text": "</s><s>farmland<loc_2><loc_0><loc_998><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "farmland"
+        ]
+      }
+    },
+    "buildings": {
+      "inference_seconds": 3.387,
+      "raw_generated_text": "</s><s>buildings<loc_2><loc_0><loc_998><loc_998></s>",
+      "parsed": {
+        "bboxes": [
+          [
+            1.6949999332427979,
+            0.22599999606609344,
+            676.9829711914062,
+            451.3219909667969
+          ]
+        ],
+        "labels": [
+          "buildings"
+        ]
+      }
+    }
+  },
+  "boxes_differ_between_phrases": false,
+  "overlay_image_path": "second_success_test_grounding_overlay.png",
+  "note_this_is_not_the_classical_baseline": "This test calls microsoft/Florence-2-base directly. It does not import or use src/grounding/grounding.py (the v0 classical-CV baseline), per the explicit instruction not to use that baseline for this test.",
+  "error": null,
+  "traceback": null,
+  "finished_at_utc": "2026-09-05T16:04:33.653905Z"
+}

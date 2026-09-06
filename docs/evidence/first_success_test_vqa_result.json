@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "test_name": "first_success_test_vqa",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "question": "What is the dominant land cover or feature visible in this image?",
+  "started_at_utc": "2026-09-05T14:54:35.122136Z",
+  "status": "SUCCESS",
+  "model_load_success": true,
+  "model_load_seconds": 46.891,
+  "inference_seconds": 38.457,
+  "output_text": "User:\n\n\n\nWhat is the dominant land cover or feature visible in this image?\nAssistant: The dominant land cover or feature in this image is farmland.",
+  "backend": "cpu",
+  "torch_version": "2.14.0+cpu",
+  "transformers_version": "4.57.1",
+  "ram_baseline_mb": 17.6,
+  "ram_after_load_mb": 1309.1,
+  "ram_after_inference_mb": 1167.8,
+  "peak_working_set_mb": 2882.7,
+  "error": null,
+  "finished_at_utc": "2026-09-05T14:56:09.411893Z"
+}

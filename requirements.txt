@@ -1,0 +1,32 @@
+# Core runtime dependencies for SatQuery AI (app/ + src/).
+# Verified working together on Python 3.10.x (the supported/tested version;
+# see README.md "Installation"). Install with:
+#   pip install -r requirements.txt
+#
+# CPU-only by default. If you want the smaller CPU-only PyTorch wheel instead
+# of pulling CUDA-bundled binaries, install torch first from the CPU index:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch
+#   pip install -r requirements.txt
+
+# --- UI ---
+streamlit>=1.32
+
+# --- Classical computer vision (grounding / change / fusion / VQA fallback) ---
+opencv-python>=4.9
+numpy>=1.26
+Pillow>=10.0
+scikit-learn>=1.4
+scikit-image>=0.22
+# scipy is not imported directly anywhere in src/ or app/, but installs
+# automatically as a transitive dependency of scikit-image/scikit-learn
+# (both declare it in their own package metadata) - no explicit pin needed.
+
+# --- Reporting ---
+reportlab>=4.0
+
+# --- Vision-language model (single-image VQA specialist) ---
+torch>=2.2
+transformers>=4.46          # HuggingFaceTB/SmolVLM-256M-Instruct's AutoModelForVision2Seq needs a recent transformers
+accelerate>=0.28            # required by transformers for `from_pretrained(..., low_cpu_mem_usage=True)`,
+                             # which src/specialists/vqa_smolvlm.py's _load() calls - not imported
+                             # directly anywhere in this repo, but a genuine runtime dependency

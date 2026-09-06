@@ -1,0 +1,34 @@
+# Byte-compiled / build cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments / env files
+.venv/
+venv/
+.env
+.env.*
+
+# Logs
+*.log
+
+# Caches
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Hugging Face / torch model cache (if ever created locally under the repo)
+.cache/huggingface/
+**/.cache/huggingface/
+
+# Editors / IDEs
+.vscode/
+.idea/
+
+# Local run outputs (execution traces, exports) - kept on disk, not tracked
+runs/
+
+# OS cruft
+.DS_Store
+Thumbs.db

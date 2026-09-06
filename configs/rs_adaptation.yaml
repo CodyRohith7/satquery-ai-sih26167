@@ -1,0 +1,70 @@
+# Reproducible configuration for the (NOT YET EXECUTED) remote-sensing LoRA
+# adaptation described in docs/rs_adaptation.md.
+#
+# Every value here is pinned deliberately so that a future real run is fully
+# specified in advance, rather than tuned interactively. scripts/adapt_rs_vlm.py
+# reads this file and must not silently override any of these values.
+
+run_name: "satquery_paligemma2_3b_vrsbench_lora_v1"
+status: "NOT_EXECUTED"  # flips to IN_PROGRESS / COMPLETE / FAILED only by the script itself, never by hand
+
+seed: 42
+
+base_model:
+  repo_id: "google/paligemma2-3b-pt-448"  # PaliGemma 2, not the original PaliGemma - see docs/rs_adaptation.md section 1
+  gated: true  # requires HF login + accepting the Gemma license before download
+  revision: "main"  # pin to a specific commit hash before the real run, once one is chosen
+  image_resolution: 448
+  fallback_if_gating_blocks_progress: "Qwen/Qwen2.5-VL-2B-Instruct"  # Apache-2.0, ungated - see docs/rs_adaptation.md section 1
+
+dataset:
+  name: "VRSBench"
+  hf_repo_id: "xiang709/VRSBench"
+  license: "CC BY-NC 4.0 (non-commercial)"
+  source_urls:
+    - "https://huggingface.co/datasets/xiang709/VRSBench"
+    - "https://github.com/lx709/VRSBench"
+  # Two conflicting scale figures have surfaced (paper abstract vs. a live HF
+  # page fetch showing a much larger VQA-pair count) and NEITHER has been
+  # confirmed by actually loading the data - see docs/rs_adaptation.md
+  # section 2. Do not treat either number below as fact; the real run must
+  # log what it actually measures.
+  splits_used:
+    - "vqa_train"
+    - "referring_train"
+  splits_reserved_for_eval_do_not_train_on:
+    - "vqa_test"
+    - "referring_test"
+  image_count_unverified_estimate: 29614      # appears in more than one source, still unconfirmed by direct load
+  vqa_pairs_unverified_estimate: null         # conflicting sources (tens of thousands vs. millions) - do not guess
+  referring_pairs_unverified_estimate: 52472  # from a live HF page fetch, unconfirmed by direct load
+  local_cache_path: "data/vrsbench/"           # does not exist yet anywhere this project has actually run
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: ["q_proj", "v_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  epochs: 3
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  learning_rate: 2.0e-4
+  lr_scheduler: "cosine"
+  warmup_ratio: 0.03
+  precision: "bf16"
+  max_text_length: 128
+  checkpoint_every_steps: 500
+  output_dir: "runs/rs_adaptation/"
+
+prompts:
+  # PaliGemma-style task-prefixed prompts, matching how the base model was pretrained.
+  vqa_template: "answer en {question}"
+  grounding_template: "detect {target_phrase}"
+
+hardware_assumption:
+  gpu: "single GPU, >=16GB VRAM"
+  note: "Not provisioned or tested in this sandbox; assumption only."

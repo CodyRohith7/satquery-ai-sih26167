@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "test_name": "third_success_test_grounding_dino",
+  "model_id": "IDEA-Research/grounding-dino-tiny",
+  "model_is_remote_sensing_specific": false,
+  "model_license": "apache-2.0",
+  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "phrases_tested": [
+    "farmland",
+    "buildings",
+    "an airplane"
+  ],
+  "control_phrase": "an airplane",
+  "started_at_utc": "2026-09-05T16:42:35.479974Z",
+  "status": "SUCCESS",
+  "model_load_success": true,
+  "model_load_seconds": 4.22,
+  "backend": "cpu",
+  "torch_version": "2.14.0+cpu",
+  "transformers_version": "4.57.1",
+  "ram_baseline_mb": 17.7,
+  "ram_after_load_mb": 331.2,
+  "ram_after_inference_mb": 1087.3,
+  "peak_working_set_mb": 2202.9,
+  "image_size_wh": [
+    678,
+    452
+  ],
+  "per_phrase": {
+    "farmland": {
+      "formatted_prompt": "farmland.",
+      "inference_seconds": 10.718,
+      "num_detections": 1,
+      "boxes": [
+        [
+          1.346,
+          0.896,
+          676.249,
+          450.836
+        ]
+      ],
+      "scores": [
+        0.7569
+      ],
+      "labels": [
+        "farmland"
+      ],
+      "area_fractions": [
+        0.9909
+      ]
+    },
+    "buildings": {
+      "formatted_prompt": "buildings.",
+      "inference_seconds": 9.739,
+      "num_detections": 1,
+      "boxes": [
+        [
+          1.28,
+          0.825,
+          676.325,
+          451.082
+        ]
+      ],
+      "scores": [
+        0.7386
+      ],
+      "labels": [
+        "buildings"
+      ],
+      "area_fractions": [
+        0.9918
+      ]
+    },
+    "an airplane": {
+      "formatted_prompt": "an airplane.",
+      "inference_seconds": 10.381,
+      "num_detections": 1,
+      "boxes": [
+        [
+          1.91,
+          1.263,
+          675.979,
+          450.535
+        ]
+      ],
+      "scores": [
+        0.391
+      ],
+      "labels": [
+        "an airplane"
+      ],
+      "area_fractions": [
+        0.9882
+      ]
+    }
+  },
+  "boxes_differ_between_target_phrases": true,
+  "overlay_image_path": "third_success_test_grounding_dino_overlay.png",
+  "note": "grounding-dino-tiny is a general-purpose open-vocabulary object detector, NOT remote-sensing-specific and NOT fine-tuned on satellite/aerial imagery. This test does not claim RS-domain adaptation - see this script's module docstring.",
+  "error": null,
+  "traceback": null,
+  "finished_at_utc": "2026-09-05T16:43:15.413651Z"
+}
