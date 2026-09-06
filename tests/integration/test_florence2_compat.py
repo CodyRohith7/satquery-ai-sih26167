@@ -111,7 +111,15 @@ class TestFixedGetImportsNoRecursion(unittest.TestCase):
 
     def setUp(self):
         import sys
+        import tempfile
         sys.path.insert(0, os.path.join(REPO_ROOT, "src"))
+        self._tmp_dir = tempfile.TemporaryDirectory()
+        self._fake_model_file = os.path.join(self._tmp_dir.name, "modeling_florence2.py")
+        with open(self._fake_model_file, "w", encoding="utf-8") as f:
+            f.write("import torch\nimport flash_attn\n")
+
+    def tearDown(self):
+        self._tmp_dir.cleanup()
 
     def test_get_imports_shim_does_not_recurse_on_clean_load(self):
         import torch
@@ -125,7 +133,7 @@ class TestFixedGetImportsNoRecursion(unittest.TestCase):
             # get_imports on the (possibly patched) module attribute to
             # resolve the custom modeling file's required imports.
             from transformers.dynamic_module_utils import get_imports
-            call_log.append(get_imports("modeling_florence2.py"))
+            call_log.append(get_imports(self._fake_model_file))
 
             class _FakeModel:
                 def eval(self):
@@ -166,7 +174,7 @@ class TestFixedGetImportsNoRecursion(unittest.TestCase):
 
         def _fake_from_pretrained(*args, **kwargs):
             from transformers.dynamic_module_utils import get_imports
-            call_log.append(get_imports("modeling_florence2.py"))
+            call_log.append(get_imports(self._fake_model_file))
             attempt["n"] += 1
 
             class _FakeModel:
