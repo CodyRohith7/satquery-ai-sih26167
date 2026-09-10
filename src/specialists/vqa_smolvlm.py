@@ -53,6 +53,29 @@ class SmolVLMError(RuntimeError):
 _CACHE: Dict[str, Tuple] = {}  # model_id -> (processor, model, device, dtype)
 
 
+def _adapt_unexpected_kwarg(exc: TypeError, kwargs: dict, renames: Dict[str, str]) -> bool:
+    """Mutates `kwargs` in place to work around ONE unexpected-keyword
+    TypeError from a from_pretrained() call whose accepted argument names
+    differ across transformers releases - never used to hide any other
+    kind of failure. Returns True if `kwargs` was changed (caller should
+    retry the call with the new kwargs), False if this TypeError doesn't
+    match the "unexpected keyword argument" shape or doesn't reference a
+    kwarg we actually passed (caller should re-raise it unchanged)."""
+    import re as _re
+
+    match = _re.search(r"unexpected keyword argument '([^']+)'", str(exc))
+    if not match:
+        return False
+    bad = match.group(1)
+    if bad not in kwargs:
+        return False
+    value = kwargs.pop(bad)
+    renamed = renames.get(bad)
+    if renamed and renamed not in kwargs:
+        kwargs[renamed] = value
+    return True
+
+
 def _load(model_id: str = MODEL_ID):
     """Loads once per process and caches - real load time is ~47s on the
     hardware this was verified on, so reloading per-query would make the UI
@@ -63,19 +86,46 @@ def _load(model_id: str = MODEL_ID):
         return _CACHE[model_id]
 
     import torch
-    from transformers import AutoProcessor, AutoModelForVision2Seq
+
+    # transformers v5 removed AutoModelForVision2Seq in favor of
+    # AutoModelForImageTextToText (confirmed root cause of a real, observed
+    # "ImportError: cannot import name 'AutoModelForVision2Seq'" on a
+    # transformers>=5 install - see docs/rs_adaptation.md). This is the
+    # HF-documented current class for SmolVLM and has been available since
+    # well before the >=4.46 floor this project already requires, so no
+    # requirements.txt change is needed alongside this fix.
+    try:
+        from transformers import AutoProcessor, AutoModelForImageTextToText
+    except ImportError as exc:  # noqa: BLE001 - report ANY import failure honestly, never swallow
+        import traceback as _traceback
+        raise SmolVLMError(f"{type(exc).__name__}: {exc}", _traceback.format_exc()) from exc
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float32  # verified default on CPU - see scripts/first_success_test_vqa.py
 
     try:
         processor = AutoProcessor.from_pretrained(model_id)
-        model = AutoModelForVision2Seq.from_pretrained(
-            model_id,
-            torch_dtype=dtype,
-            low_cpu_mem_usage=True,
-            _attn_implementation="eager",  # flash_attention_2 requires CUDA; this project targets CPU
-        ).to(device)
+        # Exact accepted from_pretrained() kwarg names have drifted across
+        # transformers releases (dtype/torch_dtype, attn_implementation/
+        # _attn_implementation). Rather than guess which this environment's
+        # installed version wants, adapt to the REAL TypeError it actually
+        # raises - renaming a kwarg once if a known replacement exists,
+        # otherwise dropping it - and retry. Any other exception (or a
+        # TypeError we don't recognize) still propagates below with a full
+        # traceback; this never masks a genuine load failure.
+        load_kwargs = {
+            "dtype": dtype,
+            "low_cpu_mem_usage": True,
+            "attn_implementation": "eager",  # flash_attention_2 requires CUDA; this project targets CPU
+        }
+        renames = {"dtype": "torch_dtype", "attn_implementation": "_attn_implementation"}
+        while True:
+            try:
+                model = AutoModelForImageTextToText.from_pretrained(model_id, **load_kwargs).to(device)
+                break
+            except TypeError as exc:
+                if not _adapt_unexpected_kwarg(exc, load_kwargs, renames):
+                    raise
         model.eval()
     except Exception as exc:  # noqa: BLE001 - report ANY load failure honestly, never swallow
         import traceback as _traceback
@@ -123,7 +173,11 @@ def run(
             "role": "user",
             "content": [{"type": "image"}, {"type": "text", "text": query}],
         }]
-        prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
+        # tokenize=False is explicit (not relied on as a default) because
+        # transformers v5 changed apply_chat_template's return shape when
+        # tokenize=True (now a BatchEncoding dict); this code has always
+        # assumed a plain string prompt to pass into processor(text=...).
+        prompt = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
         inputs = processor(text=prompt, images=[image], return_tensors="pt").to(device)
         prompt_len = inputs["input_ids"].shape[1]
 

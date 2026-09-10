@@ -82,6 +82,15 @@ def save_change_map(
     'before / after / change map' layout the frozen spec asked for."""
     b = _to_bgr_uint8(before)
     a = _to_bgr_uint8(after)
+    if a.shape[:2] != b.shape[:2]:
+        # Mismatched-dimension pairs are a supported, explicitly-warned-about
+        # case (see ingestion/validator.py's "pixel-level comparison will
+        # resize the second image to match the first" warning) - the change
+        # specialist's own diff computation already resizes the after image
+        # to the before image's shape before differencing (see change.py).
+        # This evidence composite must honor the same contract, or
+        # np.concatenate() below raises on any mismatched pair.
+        a = cv2.resize(a, (b.shape[1], b.shape[0]), interpolation=cv2.INTER_LINEAR)
     if change_mask.shape[:2] != a.shape[:2]:
         change_mask = cv2.resize(
             change_mask.astype(np.uint8), (a.shape[1], a.shape[0]), interpolation=cv2.INTER_NEAREST

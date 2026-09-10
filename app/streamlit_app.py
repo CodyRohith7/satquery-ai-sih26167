@@ -490,6 +490,21 @@ def _set_session_value(key: str, value: Any) -> None:
     st.session_state[key] = value
 
 
+def _seeded_text_input(label: str, key: str, default: str, **kwargs) -> str:
+    """A key-bound st.text_input() whose STARTING value is `default`,
+    without ever passing value= to the widget itself. Streamlit forbids
+    combining value= with a key that may also be set via the Session
+    State API - which render_example_chips's suggestion-chip on_click
+    (_set_session_value) does for this same key - and warns: "created
+    with a default value but also had its value set via the Session
+    State API." Seeding st.session_state BEFORE the widget is created has
+    the same visible effect (the box starts pre-filled with `default`)
+    without that conflict, and leaves typed input, chip clicks, reruns,
+    and follow-ups all working exactly as before."""
+    st.session_state.setdefault(key, default)
+    return st.text_input(label, key=key, **kwargs)
+
+
 def _trigger_rerun() -> None:
     """Restarts script execution from the top so a follow-up query's freshly
     stored result renders immediately instead of waiting for the next
@@ -1140,9 +1155,9 @@ with tab_vqa:
         modality = st.selectbox("Modality (optional)", ["Not declared", "optical", "sar"], key="vqa_modality")
         render_example_chips("vqa", "vqa_query")
         st.markdown('<div class="sq-ask-label">Ask your question</div>', unsafe_allow_html=True)
-        query = st.text_input(
-            "Query", value="Describe the major land cover types visible in this image.",
-            key="vqa_query", label_visibility="collapsed",
+        query = _seeded_text_input(
+            "Query", "vqa_query", "Describe the major land cover types visible in this image.",
+            label_visibility="collapsed",
         )
 
         note = None
@@ -1192,9 +1207,9 @@ with tab_grounding:
         st.caption("Recognized targets: water, vegetation, urban / built-up.")
         render_example_chips("gr", "gr_query")
         st.markdown('<div class="sq-ask-label">Ask your question</div>', unsafe_allow_html=True)
-        query = st.text_input(
-            "Query", value="Locate the water body in this image and highlight it.",
-            key="gr_query", label_visibility="collapsed",
+        query = _seeded_text_input(
+            "Query", "gr_query", "Locate the water body in this image and highlight it.",
+            label_visibility="collapsed",
         )
 
         note = None
@@ -1244,9 +1259,9 @@ with tab_change:
         date2 = st.date_input("After - date", value=datetime.date.today(), key="ch_date2")
         render_example_chips("ch", "ch_query")
         st.markdown('<div class="sq-ask-label">Ask your question</div>', unsafe_allow_html=True)
-        query = st.text_input(
-            "Query", value="What changed between these two dates?",
-            key="ch_query", label_visibility="collapsed",
+        query = _seeded_text_input(
+            "Query", "ch_query", "What changed between these two dates?",
+            label_visibility="collapsed",
         )
 
         note = None
@@ -1309,9 +1324,9 @@ with tab_fusion:
             upload_sar = st.file_uploader("SAR image", type=["png", "jpg", "jpeg", "tif", "tiff"], key="fu_upload_sar")
         render_example_chips("fu", "fu_query")
         st.markdown('<div class="sq-ask-label">Ask your question</div>', unsafe_allow_html=True)
-        query = st.text_input(
-            "Query", value="Use both images to identify built-up and water-covered regions.",
-            key="fu_query", label_visibility="collapsed",
+        query = _seeded_text_input(
+            "Query", "fu_query", "Use both images to identify built-up and water-covered regions.",
+            label_visibility="collapsed",
         )
 
         note = None

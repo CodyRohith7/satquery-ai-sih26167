@@ -18,6 +18,8 @@ import json
 import os
 from typing import Any, Dict
 
+from xml.sax.saxutils import escape as _xml_escape
+
 from routing import failure_classification as failure_mod
 from routing import timeline as timeline_mod
 from routing.schemas import ExecutionTrace
@@ -65,6 +67,24 @@ def export_json(trace: ExecutionTrace, out_path: str) -> str:
     with open(out_path, "w") as f:
         json.dump(trace.to_dict(), f, indent=2, default=str)
     return out_path
+
+
+def _safe_para_text(text: Any) -> str:
+    """Escapes free-form/uncontrolled text (a real model's generated answer,
+    a raw exception message, a full traceback) before it reaches reportlab's
+    Paragraph mini-XML parser. Paragraph() interprets a small set of tag
+    names (<b>, <i>, <br/>, <font>, ...) as real markup - unescaped dynamic
+    text that happens to contain one of those tag names unmatched (e.g. a
+    VLM-generated "<b>" with no closing tag, or a Python exception/repr
+    string containing a stray angle bracket) raises an uncaught ValueError
+    and aborts PDF generation entirely. Every other value placed in this
+    report (query, tool names, modality labels, fixed template strings) is
+    either rendered inside a Table cell (reportlab does not markup-parse
+    plain Table cell strings - only Paragraph()) or drawn from this
+    project's own small fixed vocabularies, so this escaping is applied only
+    at call sites that carry real free text - see docs/confidence.md and
+    routing/schemas.py for which fields are ever true free text."""
+    return _xml_escape(str(text))
 
 
 def _table(rows, col_widths=(6 * cm, 11 * cm)):
@@ -156,7 +176,7 @@ def export_pdf(trace: ExecutionTrace, out_path: str) -> str:
     # --- 3. Analysis Result ---------------------------------------------
     story.append(Paragraph("3. Analysis Result", styles["Heading2"]))
     if out is not None:
-        story.append(Paragraph(out.answer_text, styles["BodyText"]))
+        story.append(Paragraph(_safe_para_text(out.answer_text), styles["BodyText"]))
     elif trace.failure:
         story.append(Paragraph("Analysis did not complete - see Limitations & warnings below.", styles["BodyText"]))
     else:
@@ -167,7 +187,7 @@ def export_pdf(trace: ExecutionTrace, out_path: str) -> str:
     story.append(Paragraph("4. Visual Evidence", styles["Heading2"]))
     if out is not None and out.evidence:
         for ev in out.evidence:
-            story.append(Paragraph(f"<b>{ev.kind}:</b> {ev.description}", styles["BodyText"]))
+            story.append(Paragraph(f"<b>{_safe_para_text(ev.kind)}:</b> {_safe_para_text(ev.description)}", styles["BodyText"]))
             if ev.image_path and os.path.exists(ev.image_path):
                 try:
                     reader = ImageReader(ev.image_path)
@@ -229,13 +249,13 @@ def export_pdf(trace: ExecutionTrace, out_path: str) -> str:
         story.append(Paragraph(f"Router decision: task_type={decision.task_type}, tool_name={decision.tool_name}, "
                                 f"router confidence={decision.confidence:.2f}", styles["BodyText"]))
         for r in decision.reasoning:
-            story.append(Paragraph(f"&bull; {r}", styles["BodyText"]))
+            story.append(Paragraph(f"&bull; {_safe_para_text(r)}", styles["BodyText"]))
     else:
         story.append(Paragraph("No router decision was produced (input failed to load before routing).", styles["BodyText"]))
     if trace.failure:
         story.append(Spacer(1, 0.15 * cm))
         story.append(Paragraph("<b>Raw failure record</b> (full text, unedited):", styles["BodyText"]))
-        story.append(Paragraph(trace.failure.replace("\n", "<br/>"), ParagraphStyle("Mono", parent=styles["Code"], fontSize=7)))
+        story.append(Paragraph(_safe_para_text(trace.failure).replace("\n", "<br/>"), ParagraphStyle("Mono", parent=styles["Code"], fontSize=7)))
     story.append(Spacer(1, 0.3 * cm))
 
     # --- 9. Limitations & Warnings -----------------------------------------
@@ -245,12 +265,12 @@ def export_pdf(trace: ExecutionTrace, out_path: str) -> str:
     if warnings:
         any_limitation = True
         for w in warnings:
-            story.append(Paragraph(f"&bull; {w}", styles["BodyText"]))
+            story.append(Paragraph(f"&bull; {_safe_para_text(w)}", styles["BodyText"]))
     if out is not None and out.fallback_occurred:
         any_limitation = True
         story.append(Paragraph(
             f"&bull; Fallback occurred: a preferred real-model specialist failed and this output came from the "
-            f"classical fallback instead. Reason: {out.fallback_reason}", styles["BodyText"],
+            f"classical fallback instead. Reason: {_safe_para_text(out.fallback_reason)}", styles["BodyText"],
         ))
     if decision is not None and decision.task_type in ("grounding", "bitemporal_change", "optical_sar_fusion"):
         any_limitation = True

@@ -4,7 +4,7 @@
   "model_id": "IDEA-Research/grounding-dino-tiny",
   "model_is_remote_sensing_specific": false,
   "model_license": "apache-2.0",
-  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "image_path": "C:\\Users\\<user>\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
   "phrases_tested": [
     "farmland",
     "buildings",

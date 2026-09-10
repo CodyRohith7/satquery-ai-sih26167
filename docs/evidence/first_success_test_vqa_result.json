@@ -2,7 +2,7 @@
   "schema_version": 1,
   "test_name": "first_success_test_vqa",
   "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
-  "image_path": "C:\\Users\\codyr\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
+  "image_path": "C:\\Users\\<user>\\OneDrive\\Desktop\\Extras\\satellite.jpg.jpeg",
   "question": "What is the dominant land cover or feature visible in this image?",
   "started_at_utc": "2026-09-05T14:54:35.122136Z",
   "status": "SUCCESS",

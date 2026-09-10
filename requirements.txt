@@ -26,7 +26,7 @@ reportlab>=4.0
 
 # --- Vision-language model (single-image VQA specialist) ---
 torch>=2.2
-transformers>=4.46          # HuggingFaceTB/SmolVLM-256M-Instruct's AutoModelForVision2Seq needs a recent transformers
+transformers>=4.46          # HuggingFaceTB/SmolVLM-256M-Instruct's AutoModelForImageTextToText needs a recent transformers
 accelerate>=0.28            # required by transformers for `from_pretrained(..., low_cpu_mem_usage=True)`,
                              # which src/specialists/vqa_smolvlm.py's _load() calls - not imported
                              # directly anywhere in this repo, but a genuine runtime dependency
